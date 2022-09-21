@@ -1,0 +1,111 @@
+{
+  "login" : "Login",
+  "@login": {
+    "description": "to access the app"
+  },
+  "signUp": "Sign Up",
+  "@sign": {
+    "description": "to register in the app"
+  },
+
+  "phoneNumber": "Phone Number",
+  "@phone": {
+    "description": "essential for login"
+  },
+  "phoneNumberHint":"Enter your phone number",
+  "@phoneNumberHint": {
+    "description": "hint for phone number field"
+  },
+  "password": "password",
+  "@password": {
+    "description": "essential to get permission to access the app"
+  },
+  "passwordHint":"Enter your password",
+  "@passwordHint": {
+    "description": "hint for the password field"
+  },
+  "forgotPassword": "Forgot Password?",
+  "@forgotPassword": {
+    "description": "forgotPassword description"
+  },
+  "doNotHaveAccount": "Don't have an account?",
+  "@doNotHaveAccount": {
+    "description": "doNotHaveAccount description"
+  },
+  "touchLogin": "Login with Touch ID",
+  "@touchLogin": {
+    "description": "touchLogin btn"
+  },
+  "firstName": "First Name",
+  "@firstName": {
+    "description": "firstName field"
+  },
+  "lastName": "Last Name",
+  "@lastName": {
+    "description": "last field"
+  },
+  "emailAddress": "Email Address",
+  "@emailAddress": {
+    "description": "email field"
+  },
+  "nextBtn": "Next",
+  "@nextBtn": {
+    "description": "next btn description"
+  },
+  "haveAccount": "Already have an account?",
+  "@haveAccount": {
+    "description": "have account description"
+  },
+  "nid": "NID",
+  "@nid": {
+    "description": "nid field"
+  },
+  "gender": "Gender",
+  "@gender": {
+    "description": "Gender field"
+  },
+  "companyName" : "Company Name",
+  "@companyName": {
+    "description": "company name field"
+  },
+  "companyNameHint": "Company",
+  "@companyNameHint": {
+    "description": "hint for the company name field"
+  },
+  "employeeType": "Employee Type",
+  "@employeeType": {
+    "description": "employee type field"
+  },
+  "employeeTypeHint": "Permanent",
+  "@employeeTypeHint": {
+    "description": "hint for the employee Type field"
+  },
+  "salary": "Salary",
+  "@salary": {
+    "description": "salary field"
+  },
+  "salaryHint": "BDT15000",
+  "@salaryHint": {
+    "description": "hint for the salary field"
+  },
+  "newPassword": "New Password",
+  "@newPasswordHint": {
+    "description": "new pass word fiel"
+  },
+  "newPasswordHint": "..............",
+  "@newPasswordHint": {
+    "description": "hint for the new password"
+  },
+  "confirmPassword": "Confirm Password",
+  "@confirmPassword": {
+    "description": "confirm password field"
+  },
+  "confirmPasswordHint": "..............",
+  "@confirmPasswordHint": {
+    "description": "hint for confirm password field"
+  },
+  "or": "Or",
+  "@or": {
+    "description": "description of or"
+  }
+}
