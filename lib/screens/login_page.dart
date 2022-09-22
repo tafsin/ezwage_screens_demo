@@ -1,8 +1,15 @@
 
+import 'dart:convert';
+import 'dart:ffi';
+
+import 'package:ezwage_screens_demo/screens/btm_nav.dart';
+import 'package:ezwage_screens_demo/screens/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
+import '../json_model/employee_verfi_model.dart';
 import '../widgets/language_picker_widget.dart';
+import 'package:http/http.dart' as http;
 
 
 
@@ -16,11 +23,43 @@ class Login_Page extends StatefulWidget {
 class _Login_PageState extends State<Login_Page> with TickerProviderStateMixin{
   TextEditingController passwordController = TextEditingController();
   TextEditingController numberController = TextEditingController();
+  TextEditingController firstNameController = TextEditingController();
+  TextEditingController lastNameController = TextEditingController();
+  TextEditingController emailAddressController = TextEditingController();
+  TextEditingController genderController = TextEditingController();
+  TextEditingController companyController = TextEditingController();
+  TextEditingController employeeTypeController = TextEditingController();
+  TextEditingController salaryController = TextEditingController();
+  TextEditingController newPasswordController = TextEditingController();
+  TextEditingController confirmPasswordController = TextEditingController();
+  TextEditingController numberSignUpController = TextEditingController();
+  TextEditingController nidController = TextEditingController();
+
+
   int _currentTabIndex = 0;
   bool nxt1 = false;
   bool nxt2 = false;
   bool nxt3 = false;
   int activeIndex = 0;
+Future<void>verifyPhone()async{
+  try{
+    http.Response response= await http.get(Uri.parse('http://10.0.2.2:8000/api/employee/getEmployee/${numberController.text}'));
+    print('info');
+    print(response.statusCode);
+    var jsdata = jsonDecode(response.body);
+    var  data = EmployeeVerificationModel.fromJson(jsdata).data![0];
+    print(data);
+
+
+    // print(data['roles'][0]);
+    // if(data['roles'][0] == 'Admin'){
+    //   Navigator.push(context, MaterialPageRoute(builder: (context)=>Admin_Dashboard()));
+    // }
+  }
+  catch(e){
+    print(e);
+  }
+}
 
 
 
@@ -156,9 +195,11 @@ class _Login_PageState extends State<Login_Page> with TickerProviderStateMixin{
 
 
                                       child: TextFormField(
+
                                         controller: numberController,
                                         decoration: InputDecoration(
                                           border: InputBorder.none,
+
 
 
                                           hintText: AppLocalizations.of(context)!.phoneNumberHint,
@@ -209,7 +250,7 @@ class _Login_PageState extends State<Login_Page> with TickerProviderStateMixin{
 
 
                                       child: TextFormField(
-                                        controller: numberController,
+                                        controller: passwordController,
                                         decoration: InputDecoration(
                                           border: InputBorder.none,
 
@@ -254,7 +295,9 @@ class _Login_PageState extends State<Login_Page> with TickerProviderStateMixin{
                                             style: ElevatedButton.styleFrom(
                                                 primary: Color(0xffdb1695)
                                             ),
-                                            onPressed: (){}, child: Text(AppLocalizations.of(context)!.login))),
+                                            onPressed: (){
+                                              Navigator.push(context, MaterialPageRoute(builder: (context)=> Bottom_NavigationBar()));
+                                            }, child: Text(AppLocalizations.of(context)!.login))),
                                     SizedBox(
                                       height: 10,
                                     ),
@@ -366,7 +409,7 @@ class _Login_PageState extends State<Login_Page> with TickerProviderStateMixin{
     return Form(
       child: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
+        child: ListView(
           children: [
             Align(
               alignment: Alignment.centerLeft,
@@ -398,7 +441,7 @@ class _Login_PageState extends State<Login_Page> with TickerProviderStateMixin{
 
 
               child: TextFormField(
-                controller: numberController,
+                controller: firstNameController,
                 decoration: InputDecoration(
                   border: InputBorder.none,
 
@@ -413,6 +456,7 @@ class _Login_PageState extends State<Login_Page> with TickerProviderStateMixin{
                     borderRadius: BorderRadius.circular(10.0),
                   ),
                 ),
+
 
 
               ),
@@ -450,7 +494,7 @@ class _Login_PageState extends State<Login_Page> with TickerProviderStateMixin{
 
 
               child: TextFormField(
-                controller: numberController,
+                controller: lastNameController,
                 decoration: InputDecoration(
                   border: InputBorder.none,
 
@@ -502,7 +546,7 @@ class _Login_PageState extends State<Login_Page> with TickerProviderStateMixin{
 
 
               child: TextFormField(
-                controller: numberController,
+                controller: emailAddressController,
                 decoration: InputDecoration(
                   border: InputBorder.none,
 
@@ -553,24 +597,35 @@ class _Login_PageState extends State<Login_Page> with TickerProviderStateMixin{
               ),
 
 
-              child: TextFormField(
-                controller: numberController,
-                decoration: InputDecoration(
-                  border: InputBorder.none,
+              child: FocusScope(
+                onFocusChange: (value){
+                  if(!value){
+                    verifyPhone();
+                  }
+                  else{
+                    print("hello");
+                  }
+
+                },
+                child: TextFormField(
+                  controller: numberSignUpController,
+                  decoration: InputDecoration(
+                    border: InputBorder.none,
 
 
-                  hintText: AppLocalizations.of(context)!.phoneNumberHint,
-                  hintStyle: TextStyle(color: Colors.blueGrey,fontSize: 12),
-                  contentPadding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 6.0),
-                  enabledBorder: OutlineInputBorder(
+                    hintText: AppLocalizations.of(context)!.phoneNumberHint,
+                    hintStyle: TextStyle(color: Colors.blueGrey,fontSize: 12),
+                    contentPadding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 6.0),
+                    enabledBorder: OutlineInputBorder(
 
-                    borderSide: BorderSide.none,
+                      borderSide: BorderSide.none,
 
-                    borderRadius: BorderRadius.circular(10.0),
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
                   ),
+
+
                 ),
-
-
               ),
             ),
             SizedBox(
@@ -631,7 +686,7 @@ class _Login_PageState extends State<Login_Page> with TickerProviderStateMixin{
     return Form(
       child: Padding(
         padding: const EdgeInsets.only(left: 16,right: 16),
-        child: Column(
+        child: ListView(
           // mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Align(
@@ -664,7 +719,7 @@ class _Login_PageState extends State<Login_Page> with TickerProviderStateMixin{
 
 
               child: TextFormField(
-                controller: numberController,
+                controller: nidController,
                 decoration: InputDecoration(
                   border: InputBorder.none,
 
@@ -716,7 +771,7 @@ class _Login_PageState extends State<Login_Page> with TickerProviderStateMixin{
 
 
               child: TextFormField(
-                controller: numberController,
+                controller: genderController,
                 decoration: InputDecoration(
                   border: InputBorder.none,
 
@@ -765,8 +820,8 @@ class _Login_PageState extends State<Login_Page> with TickerProviderStateMixin{
     return Form(
       child: Padding(
         padding: const EdgeInsets.only(left: 16,right: 16),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+        child: ListView(
+         // mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Align(
               alignment: Alignment.centerLeft,
@@ -798,7 +853,7 @@ class _Login_PageState extends State<Login_Page> with TickerProviderStateMixin{
 
 
               child: TextFormField(
-                controller: numberController,
+                controller: companyController,
                 decoration: InputDecoration(
                   border: InputBorder.none,
 
@@ -850,7 +905,7 @@ class _Login_PageState extends State<Login_Page> with TickerProviderStateMixin{
 
 
               child: TextFormField(
-                controller: numberController,
+                controller: employeeTypeController,
                 decoration: InputDecoration(
                   border: InputBorder.none,
 
@@ -902,7 +957,7 @@ class _Login_PageState extends State<Login_Page> with TickerProviderStateMixin{
 
 
               child: TextFormField(
-                controller: numberController,
+                controller: salaryController,
                 decoration: InputDecoration(
                   border: InputBorder.none,
 
@@ -951,7 +1006,7 @@ class _Login_PageState extends State<Login_Page> with TickerProviderStateMixin{
     return Form(
       child: Padding(
         padding: const EdgeInsets.only(top:16,left: 16,right: 16),
-        child: Column(
+        child: ListView(
           // mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Align(
@@ -984,7 +1039,7 @@ class _Login_PageState extends State<Login_Page> with TickerProviderStateMixin{
 
 
               child: TextFormField(
-                controller: numberController,
+                controller: newPasswordController,
                 decoration: InputDecoration(
                   border: InputBorder.none,
 
@@ -1036,7 +1091,7 @@ class _Login_PageState extends State<Login_Page> with TickerProviderStateMixin{
 
 
               child: TextFormField(
-                controller: numberController,
+                controller: confirmPasswordController,
                 decoration: InputDecoration(
                   border: InputBorder.none,
 
