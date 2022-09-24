@@ -36,6 +36,16 @@ class _Bottom_NavigationBarState extends State<Bottom_NavigationBar> {
        // extendBody: true,
         body: screens[index],
         bottomNavigationBar: Container(
+          decoration: BoxDecoration(
+           boxShadow: [
+             BoxShadow(
+                 color: Color.fromRGBO(0, 0, 0, 0.1),
+                 offset: Offset(0,-1),
+                 blurRadius: 6,
+               //  spreadRadius: 0.3
+             )
+            ],
+          ),
 
           child: CurvedNavigationBar(
 

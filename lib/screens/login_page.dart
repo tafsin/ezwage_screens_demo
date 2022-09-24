@@ -2,14 +2,20 @@
 import 'dart:convert';
 import 'dart:ffi';
 
+import 'package:ezwage_screens_demo/provider/local_provider.dart';
+import 'package:ezwage_screens_demo/provider/textFormProvider.dart';
 import 'package:ezwage_screens_demo/screens/btm_nav.dart';
 import 'package:ezwage_screens_demo/screens/home_page.dart';
+import 'package:ezwage_screens_demo/widgets/language_toggle.dart';
+import 'package:ezwage_screens_demo/widgets/textFormField.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:provider/provider.dart';
 
 import '../json_model/employee_verfi_model.dart';
 import '../widgets/language_picker_widget.dart';
 import 'package:http/http.dart' as http;
+
 
 
 
@@ -41,14 +47,40 @@ class _Login_PageState extends State<Login_Page> with TickerProviderStateMixin{
   bool nxt2 = false;
   bool nxt3 = false;
   int activeIndex = 0;
+  bool hidePassLogin = true;
+  bool hidePassNew = true;
+  bool hidePassConf = true;
+  final _loginFormKey = GlobalKey<FormState>();
+  final _signUp1FormKey = GlobalKey<FormState>();
+  final _signUp2FormKey = GlobalKey<FormState>();
+  final _signUp3FormKey = GlobalKey<FormState>();
+  final _signUp4FormKey = GlobalKey<FormState>();
 Future<void>verifyPhone()async{
   try{
-    http.Response response= await http.get(Uri.parse('http://10.0.2.2:8000/api/employee/getEmployee/${numberController.text}'));
+    http.Response response= await http.get(Uri.parse('http://10.0.2.2:8000/api/employee/getEmployee/${numberSignUpController.text}'));
     print('info');
     print(response.statusCode);
-    var jsdata = jsonDecode(response.body);
-    var  data = EmployeeVerificationModel.fromJson(jsdata).data![0];
-    print(data);
+   if(response.statusCode == 201){
+     var jsdata = jsonDecode(response.body);
+     var  data = EmployeeVerificationModel.fromJson(jsdata).data![0];
+     print(data.firstName);
+     final TextFormProvider txtFormProvider = Provider.of<TextFormProvider>(context,listen: false);
+     txtFormProvider.setname(data.firstName!);
+     // setState((){
+     //   _currentTabIndex = 1;
+     //   firstNameController.text = data.firstName!;
+     //   lastNameController.text = data.lastName!;
+     //   nidController.text = data.nid!;
+     //   salaryController.text = data.salary!;
+     //   emailAddressController.text = data.email!;
+     //   //genderController.text = data.g
+     //  // employeeTypeController.text = data.employeeId!;
+     //
+     //
+     // });
+
+   }
+
 
 
     // print(data['roles'][0]);
@@ -68,345 +100,415 @@ Future<void>verifyPhone()async{
     TabController tabController = TabController(length: 2, vsync: this,initialIndex: 0);
 
     tabController.animateTo(_currentTabIndex);
-    return Scaffold(
-      body: Container(
-        width: double.infinity,
-        decoration: BoxDecoration(
-            gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.topRight,
-                colors: [
-                  Colors.lightBlueAccent,
-                  Colors.blueAccent,
+    return ChangeNotifierProvider(
+      create:(context)=> TextFormProvider(),
+      builder: (context,child) {
+        return Scaffold(
+          body: Container(
+            width: double.infinity,
+            foregroundDecoration: BoxDecoration(
 
-                ]
-            )
-        ),
+            ),
+            decoration: BoxDecoration(
 
-        child: Column(
+                gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.topRight,
+                    colors: [
+                      Colors.lightBlueAccent,
+                      Color(0xff079AF5),
 
-          children: [
-            SizedBox(
-              height:
-              20,
-            ),
-            Container(
-              child: LanguagePickerWidget(),
-            ),
-            SizedBox(
-              height:
-              10,
-            ),
-            Container(
-              height: 100,
-              child: Center(
-                child: Text('ezwage',style: TextStyle(
-                    color: Colors.white,fontSize: 30,fontWeight: FontWeight.bold
-                ),),
-              ),
+                    ]
+                ),
+
             ),
 
-            SizedBox(
-              height: 10,
-            ),
-            Expanded(
-              child: Container(
-                  decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(60),
-                          topRight: Radius.circular(60)
+            child: Column(
+
+              children: [
+                SizedBox(
+                  height:
+                  30,
+                ),
+                Container(
+                  child: Language_Toggle(),
+                ),
+
+                SizedBox(
+                  height:
+                  10,
+                ),
+
+                  Container(
+                    height: 100,
+                    child: Center(
+                      child: Text('ezwage',style: TextStyle(
+                          color: Colors.white,fontSize: 30,fontWeight: FontWeight.bold
+                      ),),
+                    ),
+                  ),
+
+
+                SizedBox(
+                  height: 10,
+                ),
+                Expanded(
+                  child: Container(
+                      decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(60),
+                              topRight: Radius.circular(60)
+                          )
+                      ),
+                      child:Column(
+                        children: [
+                          Container(
+
+                            child: TabBar(
+                              labelColor: Color(0xffdb1695),
+                              unselectedLabelColor: Colors.grey,
+                              indicatorColor: Color(0xffdb1695),
+                              indicatorSize: TabBarIndicatorSize.label,
+                              controller:  tabController,
+                              isScrollable: true,
+
+                              tabs: [
+                                Tab(child: SizedBox(
+                                    width: 60,
+                                    child: Center(
+                                      child: Text(
+                                          AppLocalizations.of(context)!.login
+
+                                      ),
+                                    )
+                                ),),
+                                Tab(child: SizedBox(
+                                    width: 70,
+                                    child: Center(
+                                      child: Text(
+                                          AppLocalizations.of(context)!.signUp
+
+                                      ),
+                                    )
+                                ),),
+
+                              ],
+
+                            ),
+                          ),
+                          Expanded(
+                            child: TabBarView(
+                              controller:  tabController,
+                              children: [
+                                Form(
+                                  key: _loginFormKey,
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(16.0),
+                                    child: ListView(
+                                      // mainAxisAlignment: MainAxisAlignment.center,
+
+                                      children: [
+                                        Align(
+                                          alignment: Alignment.centerLeft,
+
+                                          child: Padding(
+                                            padding: const EdgeInsets.only(left: 4.0),
+                                            child: Container(
+                                              child: Text(AppLocalizations.of(context)!.phoneNumber,style: TextStyle(
+                                                  fontWeight: FontWeight.w600
+                                              ),),
+                                            ),
+                                          ),
+                                        ),
+                                        SizedBox(
+                                          height: 10,
+                                        ),
+                                        Container(
+                                          decoration: BoxDecoration(
+                                            boxShadow: [
+                                              BoxShadow(
+                                                  color: Color.fromRGBO(0, 0, 0, 0.12),
+                                                  offset: Offset(1,2),
+                                                  blurRadius: 2,
+                                                  spreadRadius: 2
+                                              ),
+
+
+                                            ],
+
+                                              color: Color(0xffF6F6F6),
+                                              borderRadius: BorderRadius.circular(10)
+                                          ),
+
+
+                                          child: TextFormField(
+                                            validator: (value) {
+                                              if (value == null || value.isEmpty) {
+                                                return 'Please enter your password';
+                                              }
+                                              if (value.length < 6) {
+                                                return "Password too short";
+                                              }
+                                              return null;
+                                            },
+
+
+                                            controller: numberController,
+                                            onSaved: (value){
+                                              numberController.text = value!;
+                                            },
+                                            decoration: InputDecoration(
+                                              border: InputBorder.none,
+
+
+
+                                              hintText: AppLocalizations.of(context)!.phoneNumberHint,
+                                              hintStyle: TextStyle(color: Colors.blueGrey,fontSize: 12),
+                                              contentPadding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 6.0),
+                                              enabledBorder: OutlineInputBorder(
+
+                                                borderSide: BorderSide.none,
+
+                                                borderRadius: BorderRadius.circular(10.0),
+                                              ),
+                                            ),
+
+
+                                          ),
+                                        ),
+                                        SizedBox(
+                                          height: 15,
+                                        ),
+                                        Align(
+                                          alignment: Alignment.centerLeft,
+
+                                          child: Padding(
+                                            padding: const EdgeInsets.only(left: 4.0),
+                                            child: Container(
+                                              child: Text(AppLocalizations.of(context)!.password,style: TextStyle(
+                                                  fontWeight: FontWeight.w600
+                                              ),),
+                                            ),
+                                          ),
+                                        ),
+                                        SizedBox(
+                                          height: 10,
+                                        ),
+
+                                        Container(
+                                          decoration: BoxDecoration(
+                                            boxShadow: [
+                                              BoxShadow(
+                                                  color: Color.fromRGBO(0, 0, 0, 0.12),
+                                                  offset: Offset(1,2),
+                                                  blurRadius: 2,
+                                                  spreadRadius: 4
+                                              )
+                                            ],
+
+                                            color: Color(0xffF6F6F6),
+                                            borderRadius: BorderRadius.circular(10)
+                                          ),
+
+
+                                          child: TextFormField(
+                                            validator: (value) {
+                                              if (value == null || value.isEmpty) {
+                                                return 'Please enter your password';
+                                              }
+                                              if (value.length < 6) {
+                                                return "Password too short";
+                                              }
+                                              return null;
+                                            },
+                                            obscureText: true,
+                                            controller: passwordController,
+                                            onSaved: (value){
+                                              passwordController.text = value!;
+                                            },
+                                            decoration: InputDecoration(
+                                              border: InputBorder.none,
+
+
+                                              hintText: AppLocalizations.of(context)!.phoneNumberHint,
+                                              hintStyle: TextStyle(color: Colors.blueGrey,fontSize: 12),
+                                              contentPadding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 6.0),
+                                              suffixIcon: hidePassLogin
+                                                  ? IconButton(
+                                                icon: Icon(
+                                                  Icons.visibility_off,
+                                                  color: Colors.black54,
+                                                ),
+                                                onPressed: () {
+                                                  setState(() {
+                                                    hidePassLogin = !hidePassLogin;
+                                                  });
+                                                },
+                                              )
+                                                  : IconButton(
+                                                onPressed: () {
+                                                  setState(() {
+                                                    hidePassLogin = !hidePassLogin;
+                                                  });
+                                                },
+                                                icon: Icon(
+                                                  Icons.visibility,
+                                                  color: Colors.black54,
+                                                ),
+                                              ),
+                                              enabledBorder: OutlineInputBorder(
+
+                                                borderSide: BorderSide.none,
+
+                                                borderRadius: BorderRadius.circular(10.0),
+                                              ),
+                                            ),
+
+
+                                          ),
+                                        ),
+                                        SizedBox(
+                                          height: 5,
+                                        ),
+
+
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.end,
+                                          children: [
+
+                                            Text(AppLocalizations.of(context)!.forgotPassword,
+
+                                              style: TextStyle(color: Colors.grey,fontSize: 12,
+                                              ),
+                                            )
+                                          ],
+                                        ),
+                                        SizedBox(
+                                          height: 10,
+                                        ),
+                                        SizedBox(
+                                            width: double.infinity, // <-- match_parent
+// <-- match-parent
+                                            child: ElevatedButton(
+                                                style: ElevatedButton.styleFrom(
+                                                    primary: Color(0xffdb1695)
+                                                ),
+                                                onPressed: (){
+                                                  Navigator.push(context, MaterialPageRoute(builder: (context)=> Bottom_NavigationBar()));
+                                                }, child: Text(AppLocalizations.of(context)!.login))),
+                                        SizedBox(
+                                          height: 10,
+                                        ),
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            Text(AppLocalizations.of(context)!.doNotHaveAccount,
+
+                                              style: TextStyle(color: Colors.grey,fontSize: 12,
+                                              ),
+                                            ),
+                                            SizedBox(
+                                              width: 2,
+                                            ),
+                                            GestureDetector(
+                                              onTap: (){
+                                                print('sign up');
+                                                setState(() {
+                                                  _currentTabIndex = 1;
+                                                });
+                                              },
+                                              child: Text(AppLocalizations.of(context)!.signUp,
+
+                                                style: TextStyle(color: Colors.blue,fontSize: 12, fontWeight: FontWeight.w600
+
+                                                ),
+                                              ),
+                                            )
+                                          ],
+                                        ),
+                                        SizedBox(
+                                          height: 25,
+                                        ),
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            Expanded(
+                                              child: SizedBox(
+                                                width: 60,
+                                                child: Divider(
+                                                  color: Colors.grey,
+                                                ),
+                                              ),
+                                            ),
+                                            SizedBox(
+                                              width: 2,
+                                            ),
+                                            Text(AppLocalizations.of(context)!.or),
+                                            SizedBox(
+                                              width: 2,
+                                            ),
+                                            Expanded(child: SizedBox(
+                                              width: 60,
+                                              child: Divider(
+                                                color: Colors.grey,
+                                              ),
+                                            ))
+                                          ],
+                                        ),
+                                        SizedBox(
+                                          height: 15,
+                                        ),
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            Container(
+                                                height: 38,
+                                                width: 40,
+
+
+                                                decoration: BoxDecoration(
+                                                    color: Colors.blue,
+                                                    borderRadius: BorderRadius.circular(5)
+                                                ),
+                                                child: IconButton(onPressed: (){}, icon:Icon(Icons.fingerprint,color: Colors.white,size: 25,))),
+                                            SizedBox(
+                                              width: 5,
+                                            ),
+                                            Text(AppLocalizations.of(context)!.touchLogin)
+                                          ],
+                                        )
+
+
+
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                formBuilder()
+
+
+
+
+                              ],
+                            ),
+                          )
+                        ],
                       )
                   ),
-                  child:Column(
-                    children: [
-                      Container(
+                )
+              ],
+            ),
 
-                        child: TabBar(
-                          labelColor: Color(0xffdb1695),
-                          unselectedLabelColor: Colors.grey,
-                          indicatorColor: Color(0xffdb1695),
-                          indicatorSize: TabBarIndicatorSize.label,
-                          controller:  tabController,
-                          isScrollable: true,
+          ),
 
-                          tabs: [
-                            Tab(child: SizedBox(
-                                width: 60,
-                                child: Center(
-                                  child: Text(
-                                      AppLocalizations.of(context)!.login
-
-                                  ),
-                                )
-                            ),),
-                            Tab(child: SizedBox(
-                                width: 70,
-                                child: Center(
-                                  child: Text(
-                                      AppLocalizations.of(context)!.signUp
-
-                                  ),
-                                )
-                            ),),
-
-                          ],
-
-                        ),
-                      ),
-                      Expanded(
-                        child: TabBarView(
-                          controller:  tabController,
-                          children: [
-                            Form(
-                              child: Padding(
-                                padding: const EdgeInsets.all(16.0),
-                                child: ListView(
-                                  // mainAxisAlignment: MainAxisAlignment.center,
-
-                                  children: [
-                                    Align(
-                                      alignment: Alignment.centerLeft,
-
-                                      child: Padding(
-                                        padding: const EdgeInsets.only(left: 4.0),
-                                        child: Container(
-                                          child: Text(AppLocalizations.of(context)!.phoneNumber,style: TextStyle(
-                                              fontWeight: FontWeight.w600
-                                          ),),
-                                        ),
-                                      ),
-                                    ),
-                                    SizedBox(
-                                      height: 10,
-                                    ),
-                                    Container(
-                                      decoration: BoxDecoration(
-
-                                          gradient: LinearGradient(begin: Alignment.bottomRight, stops: [
-                                            0.1,
-                                            0.9
-                                          ], colors: [
-                                            Colors.black.withOpacity(.2),
-                                            Colors.black.withOpacity(.1)
-                                          ]),
-                                          borderRadius: BorderRadius.circular(10)
-                                      ),
-
-
-                                      child: TextFormField(
-
-                                        controller: numberController,
-                                        decoration: InputDecoration(
-                                          border: InputBorder.none,
-
-
-
-                                          hintText: AppLocalizations.of(context)!.phoneNumberHint,
-                                          hintStyle: TextStyle(color: Colors.blueGrey,fontSize: 12),
-                                          contentPadding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 6.0),
-                                          enabledBorder: OutlineInputBorder(
-
-                                            borderSide: BorderSide.none,
-
-                                            borderRadius: BorderRadius.circular(10.0),
-                                          ),
-                                        ),
-
-
-                                      ),
-                                    ),
-                                    SizedBox(
-                                      height: 15,
-                                    ),
-                                    Align(
-                                      alignment: Alignment.centerLeft,
-
-                                      child: Padding(
-                                        padding: const EdgeInsets.only(left: 4.0),
-                                        child: Container(
-                                          child: Text(AppLocalizations.of(context)!.password,style: TextStyle(
-                                              fontWeight: FontWeight.w600
-                                          ),),
-                                        ),
-                                      ),
-                                    ),
-                                    SizedBox(
-                                      height: 10,
-                                    ),
-
-                                    Container(
-                                      decoration: BoxDecoration(
-// Box decoration takes a gradient
-                                          gradient: LinearGradient(begin: Alignment.bottomRight, stops: [
-                                            0.1,
-                                            0.9
-                                          ], colors: [
-                                            Colors.black.withOpacity(.2),
-                                            Colors.black.withOpacity(.1)
-                                          ]),
-                                          borderRadius: BorderRadius.circular(10)
-                                      ),
-
-
-                                      child: TextFormField(
-                                        controller: passwordController,
-                                        decoration: InputDecoration(
-                                          border: InputBorder.none,
-
-
-                                          hintText: AppLocalizations.of(context)!.phoneNumberHint,
-                                          hintStyle: TextStyle(color: Colors.blueGrey,fontSize: 12),
-                                          contentPadding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 6.0),
-                                          enabledBorder: OutlineInputBorder(
-
-                                            borderSide: BorderSide.none,
-
-                                            borderRadius: BorderRadius.circular(10.0),
-                                          ),
-                                        ),
-
-
-                                      ),
-                                    ),
-                                    SizedBox(
-                                      height: 5,
-                                    ),
-
-
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.end,
-                                      children: [
-
-                                        Text(AppLocalizations.of(context)!.forgotPassword,
-
-                                          style: TextStyle(color: Colors.grey,fontSize: 12,
-                                          ),
-                                        )
-                                      ],
-                                    ),
-                                    SizedBox(
-                                      height: 10,
-                                    ),
-                                    SizedBox(
-                                        width: double.infinity, // <-- match_parent
-// <-- match-parent
-                                        child: ElevatedButton(
-                                            style: ElevatedButton.styleFrom(
-                                                primary: Color(0xffdb1695)
-                                            ),
-                                            onPressed: (){
-                                              Navigator.push(context, MaterialPageRoute(builder: (context)=> Bottom_NavigationBar()));
-                                            }, child: Text(AppLocalizations.of(context)!.login))),
-                                    SizedBox(
-                                      height: 10,
-                                    ),
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        Text(AppLocalizations.of(context)!.doNotHaveAccount,
-
-                                          style: TextStyle(color: Colors.grey,fontSize: 12,
-                                          ),
-                                        ),
-                                        SizedBox(
-                                          width: 2,
-                                        ),
-                                        GestureDetector(
-                                          onTap: (){
-                                            print('sign up');
-                                            setState(() {
-                                              _currentTabIndex = 1;
-                                            });
-                                          },
-                                          child: Text(AppLocalizations.of(context)!.signUp,
-
-                                            style: TextStyle(color: Colors.blue,fontSize: 12, fontWeight: FontWeight.w600
-
-                                            ),
-                                          ),
-                                        )
-                                      ],
-                                    ),
-                                    SizedBox(
-                                      height: 25,
-                                    ),
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        Expanded(
-                                          child: SizedBox(
-                                            width: 60,
-                                            child: Divider(
-                                              color: Colors.grey,
-                                            ),
-                                          ),
-                                        ),
-                                        SizedBox(
-                                          width: 2,
-                                        ),
-                                        Text(AppLocalizations.of(context)!.or),
-                                        SizedBox(
-                                          width: 2,
-                                        ),
-                                        Expanded(child: SizedBox(
-                                          width: 60,
-                                          child: Divider(
-                                            color: Colors.grey,
-                                          ),
-                                        ))
-                                      ],
-                                    ),
-                                    SizedBox(
-                                      height: 15,
-                                    ),
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        Container(
-                                            height: 38,
-                                            width: 40,
-
-
-                                            decoration: BoxDecoration(
-                                                color: Colors.blue,
-                                                borderRadius: BorderRadius.circular(5)
-                                            ),
-                                            child: IconButton(onPressed: (){}, icon:Icon(Icons.fingerprint,color: Colors.white,size: 25,))),
-                                        SizedBox(
-                                          width: 5,
-                                        ),
-                                        Text(AppLocalizations.of(context)!.touchLogin)
-                                      ],
-                                    )
-
-
-
-                                  ],
-                                ),
-                              ),
-                            ),
-                            formBuilder()
-
-
-
-
-                          ],
-                        ),
-                      )
-                    ],
-                  )
-              ),
-            )
-          ],
-        ),
-
-      ),
-
+        );
+      }
     );
   }
   Widget signUp1(){
     return Form(
+      key: _signUp1FormKey,
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: ListView(
@@ -428,20 +530,31 @@ Future<void>verifyPhone()async{
             ),
             Container(
               decoration: BoxDecoration(
+                  boxShadow: [
+                    BoxShadow(
+                        color: Color.fromRGBO(0, 0, 0, 0.12),
+                        offset: Offset(1,2),
+                        blurRadius: 2,
+                        spreadRadius: 4
+                    )
+                  ],
 
-                  gradient: LinearGradient(begin: Alignment.bottomRight, stops: [
-                    0.1,
-                    0.9
-                  ], colors: [
-                    Colors.black.withOpacity(.2),
-                    Colors.black.withOpacity(.1)
-                  ]),
+                  color: Color(0xffF6F6F6),
                   borderRadius: BorderRadius.circular(10)
               ),
 
 
               child: TextFormField(
                 controller: firstNameController,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter your password';
+                  }
+                  if (value.length < 6) {
+                    return "Password too short";
+                  }
+                  return null;
+                },
                 decoration: InputDecoration(
                   border: InputBorder.none,
 
@@ -481,19 +594,30 @@ Future<void>verifyPhone()async{
             ),
             Container(
               decoration: BoxDecoration(
+                  boxShadow: [
+                    BoxShadow(
+                        color: Color.fromRGBO(0, 0, 0, 0.12),
+                        offset: Offset(1,2),
+                        blurRadius: 2,
+                        spreadRadius: 4
+                    )
+                  ],
 
-                  gradient: LinearGradient(begin: Alignment.bottomRight, stops: [
-                    0.1,
-                    0.9
-                  ], colors: [
-                    Colors.black.withOpacity(.2),
-                    Colors.black.withOpacity(.1)
-                  ]),
+                  color: Color(0xffF6F6F6),
                   borderRadius: BorderRadius.circular(10)
               ),
 
 
               child: TextFormField(
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter your password';
+                  }
+                  if (value.length < 6) {
+                    return "Password too short";
+                  }
+                  return null;
+                },
                 controller: lastNameController,
                 decoration: InputDecoration(
                   border: InputBorder.none,
@@ -533,20 +657,35 @@ Future<void>verifyPhone()async{
             ),
             Container(
               decoration: BoxDecoration(
+                  boxShadow: [
+                    BoxShadow(
+                        color: Color.fromRGBO(0, 0, 0, 0.12),
+                        offset: Offset(1,2),
+                        blurRadius: 2,
+                        spreadRadius: 4
+                    )
+                  ],
 
-                  gradient: LinearGradient(begin: Alignment.bottomRight, stops: [
-                    0.1,
-                    0.9
-                  ], colors: [
-                    Colors.black.withOpacity(.2),
-                    Colors.black.withOpacity(.1)
-                  ]),
+                  color: Color(0xffF6F6F6),
                   borderRadius: BorderRadius.circular(10)
               ),
 
 
               child: TextFormField(
                 controller: emailAddressController,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Field cannot be empty';
+                  }
+                  if (!RegExp('^[a-zA-Z0-9_.-]+@[a-zA-Z0-9.-]+.[a-z]')
+                      .hasMatch(value)) {
+                    return "Please Enter Valid Email";
+                  }
+                  return null;
+                },
+                onSaved: (value){
+                  emailAddressController.text = value!;
+                },
                 decoration: InputDecoration(
                   border: InputBorder.none,
 
@@ -585,14 +724,16 @@ Future<void>verifyPhone()async{
             ),
             Container(
               decoration: BoxDecoration(
+                  boxShadow: [
+                    BoxShadow(
+                        color: Color.fromRGBO(0, 0, 0, 0.12),
+                        offset: Offset(1,2),
+                        blurRadius: 2,
+                        spreadRadius: 4
+                    )
+                  ],
 
-                  gradient: LinearGradient(begin: Alignment.bottomRight, stops: [
-                    0.1,
-                    0.9
-                  ], colors: [
-                    Colors.black.withOpacity(.2),
-                    Colors.black.withOpacity(.1)
-                  ]),
+                  color: Color(0xffF6F6F6),
                   borderRadius: BorderRadius.circular(10)
               ),
 
@@ -608,6 +749,15 @@ Future<void>verifyPhone()async{
 
                 },
                 child: TextFormField(
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter your password';
+                    }
+                    if (value.length < 6) {
+                      return "Password too short";
+                    }
+                    return null;
+                  },
                   controller: numberSignUpController,
                   decoration: InputDecoration(
                     border: InputBorder.none,
@@ -623,6 +773,9 @@ Future<void>verifyPhone()async{
                       borderRadius: BorderRadius.circular(10.0),
                     ),
                   ),
+                    onSaved: (value){
+              numberSignUpController.text = value!;
+              },
 
 
                 ),
@@ -684,6 +837,7 @@ Future<void>verifyPhone()async{
   }
   Widget signUp2(){
     return Form(
+      key: _signUp2FormKey,
       child: Padding(
         padding: const EdgeInsets.only(left: 16,right: 16),
         child: ListView(
@@ -706,20 +860,34 @@ Future<void>verifyPhone()async{
             ),
             Container(
               decoration: BoxDecoration(
+                  boxShadow: [
+                    BoxShadow(
+                        color: Color.fromRGBO(0, 0, 0, 0.12),
+                        offset: Offset(1,2),
+                        blurRadius: 2,
+                        spreadRadius: 4
+                    )
+                  ],
 
-                  gradient: LinearGradient(begin: Alignment.bottomRight, stops: [
-                    0.1,
-                    0.9
-                  ], colors: [
-                    Colors.black.withOpacity(.2),
-                    Colors.black.withOpacity(.1)
-                  ]),
+                  color: Color(0xffF6F6F6),
                   borderRadius: BorderRadius.circular(10)
               ),
 
 
               child: TextFormField(
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter your password';
+                  }
+                  if (value.length < 6) {
+                    return "Password too short";
+                  }
+                  return null;
+                },
                 controller: nidController,
+                onSaved: (value){
+                  nidController.text = value!;
+                },
                 decoration: InputDecoration(
                   border: InputBorder.none,
 
@@ -758,20 +926,34 @@ Future<void>verifyPhone()async{
             ),
             Container(
               decoration: BoxDecoration(
+                  boxShadow: [
+                    BoxShadow(
+                        color: Color.fromRGBO(0, 0, 0, 0.12),
+                        offset: Offset(1,2),
+                        blurRadius: 2,
+                        spreadRadius: 4
+                    )
+                  ],
 
-                  gradient: LinearGradient(begin: Alignment.bottomRight, stops: [
-                    0.1,
-                    0.9
-                  ], colors: [
-                    Colors.black.withOpacity(.2),
-                    Colors.black.withOpacity(.1)
-                  ]),
+                  color: Color(0xffF6F6F6),
                   borderRadius: BorderRadius.circular(10)
               ),
 
 
               child: TextFormField(
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter your password';
+                  }
+                  if (value.length < 6) {
+                    return "Password too short";
+                  }
+                  return null;
+                },
                 controller: genderController,
+                onSaved: (value){
+                  genderController.text = value!;
+                },
                 decoration: InputDecoration(
                   border: InputBorder.none,
 
@@ -818,6 +1000,7 @@ Future<void>verifyPhone()async{
   }
   Widget signUp3(){
     return Form(
+      key: _signUp3FormKey,
       child: Padding(
         padding: const EdgeInsets.only(left: 16,right: 16),
         child: ListView(
@@ -840,37 +1023,21 @@ Future<void>verifyPhone()async{
             ),
             Container(
               decoration: BoxDecoration(
+                  boxShadow: [
+                    BoxShadow(
+                        color: Color.fromRGBO(0, 0, 0, 0.12),
+                        offset: Offset(1,2),
+                        blurRadius: 2,
+                        spreadRadius: 4
+                    )
+                  ],
 
-                  gradient: LinearGradient(begin: Alignment.bottomRight, stops: [
-                    0.1,
-                    0.9
-                  ], colors: [
-                    Colors.black.withOpacity(.2),
-                    Colors.black.withOpacity(.1)
-                  ]),
+                  color: Color(0xffF6F6F6),
                   borderRadius: BorderRadius.circular(10)
               ),
 
 
-              child: TextFormField(
-                controller: companyController,
-                decoration: InputDecoration(
-                  border: InputBorder.none,
-
-
-                  hintText: AppLocalizations.of(context)!.companyNameHint,
-                  hintStyle: TextStyle(color: Colors.blueGrey,fontSize: 12),
-                  contentPadding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 6.0),
-                  enabledBorder: OutlineInputBorder(
-
-                    borderSide: BorderSide.none,
-
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
-                ),
-
-
-              ),
+              child: textFormField(numberController:companyController ,context: context,hintTxt: AppLocalizations.of(context)!.companyName,)
             ),
             SizedBox(
               height: 15,
@@ -892,20 +1059,34 @@ Future<void>verifyPhone()async{
             ),
             Container(
               decoration: BoxDecoration(
+                  boxShadow: [
+                    BoxShadow(
+                        color: Color.fromRGBO(0, 0, 0, 0.12),
+                        offset: Offset(1,2),
+                        blurRadius: 2,
+                        spreadRadius: 4
+                    )
+                  ],
 
-                  gradient: LinearGradient(begin: Alignment.bottomRight, stops: [
-                    0.1,
-                    0.9
-                  ], colors: [
-                    Colors.black.withOpacity(.2),
-                    Colors.black.withOpacity(.1)
-                  ]),
+                  color: Color(0xffF6F6F6),
                   borderRadius: BorderRadius.circular(10)
               ),
 
 
               child: TextFormField(
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter your password';
+                  }
+                  if (value.length < 6) {
+                    return "Password too short";
+                  }
+                  return null;
+                },
                 controller: employeeTypeController,
+                onSaved: (value){
+                  employeeTypeController.text = value!;
+                },
                 decoration: InputDecoration(
                   border: InputBorder.none,
 
@@ -944,20 +1125,34 @@ Future<void>verifyPhone()async{
             ),
             Container(
               decoration: BoxDecoration(
+                  boxShadow: [
+                    BoxShadow(
+                        color: Color.fromRGBO(0, 0, 0, 0.12),
+                        offset: Offset(1,2),
+                        blurRadius: 2,
+                        spreadRadius: 4
+                    )
+                  ],
 
-                  gradient: LinearGradient(begin: Alignment.bottomRight, stops: [
-                    0.1,
-                    0.9
-                  ], colors: [
-                    Colors.black.withOpacity(.2),
-                    Colors.black.withOpacity(.1)
-                  ]),
+                  color: Color(0xffF6F6F6),
                   borderRadius: BorderRadius.circular(10)
               ),
 
 
               child: TextFormField(
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter your password';
+                  }
+                  if (value.length < 6) {
+                    return "Password too short";
+                  }
+                  return null;
+                },
                 controller: salaryController,
+                onSaved: (value){
+                  salaryController.text = value!;
+                },
                 decoration: InputDecoration(
                   border: InputBorder.none,
 
@@ -1004,6 +1199,7 @@ Future<void>verifyPhone()async{
   }
   Widget signUp4(){
     return Form(
+    key: _signUp4FormKey,
       child: Padding(
         padding: const EdgeInsets.only(top:16,left: 16,right: 16),
         child: ListView(
@@ -1026,25 +1222,64 @@ Future<void>verifyPhone()async{
             ),
             Container(
               decoration: BoxDecoration(
+                  boxShadow: [
+                    BoxShadow(
+                        color: Color.fromRGBO(0, 0, 0, 0.12),
+                        offset: Offset(1,2),
+                        blurRadius: 2,
+                        spreadRadius: 4
+                    )
+                  ],
 
-                  gradient: LinearGradient(begin: Alignment.bottomRight, stops: [
-                    0.1,
-                    0.9
-                  ], colors: [
-                    Colors.black.withOpacity(.2),
-                    Colors.black.withOpacity(.1)
-                  ]),
+                  color: Color(0xffF6F6F6),
                   borderRadius: BorderRadius.circular(10)
               ),
 
 
               child: TextFormField(
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter your password';
+                  }
+                  if (value.length < 6) {
+                    return "Password too short";
+                  }
+                  return null;
+                },
+                obscureText: true,
                 controller: newPasswordController,
+                onSaved: (value){
+                  newPasswordController.text = value!;
+                },
                 decoration: InputDecoration(
                   border: InputBorder.none,
+                  suffixIcon: hidePassNew
+                      ? IconButton(
+                    icon: Icon(
+                      Icons.visibility_off,
+                      color: Colors.black54,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        hidePassNew = !hidePassNew;
+                      });
+                    },
+                  )
+                      : IconButton(
+                    onPressed: () {
+                      setState(() {
+                        hidePassNew = !hidePassNew;
+                      });
+                    },
+                    icon: Icon(
+                      Icons.visibility,
+                      color: Colors.black54,
+                    ),
+                  ),
 
 
                   hintText:AppLocalizations.of(context)!.newPasswordHint,
+
                   hintStyle: TextStyle(color: Colors.blueGrey,fontSize: 12),
                   contentPadding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 6.0),
                   enabledBorder: OutlineInputBorder(
@@ -1078,22 +1313,60 @@ Future<void>verifyPhone()async{
             ),
             Container(
               decoration: BoxDecoration(
+                  boxShadow: [
+                    BoxShadow(
+                        color: Color.fromRGBO(0, 0, 0, 0.12),
+                        offset: Offset(1,2),
+                        blurRadius: 2,
+                        spreadRadius: 4
+                    )
+                  ],
 
-                  gradient: LinearGradient(begin: Alignment.bottomRight, stops: [
-                    0.1,
-                    0.9
-                  ], colors: [
-                    Colors.black.withOpacity(.2),
-                    Colors.black.withOpacity(.1)
-                  ]),
+                  color: Color(0xffF6F6F6),
                   borderRadius: BorderRadius.circular(10)
               ),
 
 
               child: TextFormField(
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter your password';
+                  }
+                  if (value.length < 6) {
+                    return "Password too short";
+                  }
+                  return null;
+                },
+                obscureText: true,
                 controller: confirmPasswordController,
+                onSaved: (value){
+                  confirmPasswordController.text = value!;
+                },
                 decoration: InputDecoration(
                   border: InputBorder.none,
+                  suffixIcon: hidePassConf
+                      ? IconButton(
+                    icon: Icon(
+                      Icons.visibility_off,
+                      color: Colors.black54,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        hidePassConf = !hidePassConf;
+                      });
+                    },
+                  )
+                      : IconButton(
+                    onPressed: () {
+                      setState(() {
+                        hidePassConf = !hidePassConf;
+                      });
+                    },
+                    icon: Icon(
+                      Icons.visibility,
+                      color: Colors.black54,
+                    ),
+                  ),
 
 
                   hintText: AppLocalizations.of(context)!.confirmPasswordHint,
@@ -1148,6 +1421,50 @@ Future<void>verifyPhone()async{
       default:
         return signUp1();
     }
+  }
+}
+
+class textForm extends StatelessWidget {
+  const textForm({
+    Key? key,
+    required this.companyController,
+    required this.context,
+  }) : super(key: key);
+
+  final TextEditingController companyController;
+  final BuildContext context;
+
+  @override
+  Widget build(BuildContext context) {
+    return TextFormField(
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Please enter a value';
+        }
+
+        return null;
+      },
+      controller: companyController,
+      onSaved: (value){
+        companyController.text = value!;
+      },
+      decoration: InputDecoration(
+        border: InputBorder.none,
+
+
+        hintText: AppLocalizations.of(context)!.companyNameHint,
+        hintStyle: TextStyle(color: Colors.blueGrey,fontSize: 12),
+        contentPadding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 6.0),
+        enabledBorder: OutlineInputBorder(
+
+          borderSide: BorderSide.none,
+
+          borderRadius: BorderRadius.circular(10.0),
+        ),
+      ),
+
+
+    );
   }
 }
 
