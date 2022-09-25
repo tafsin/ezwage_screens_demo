@@ -40,7 +40,8 @@ dependencies:
   curved_navigation_bar: ^1.0.3
   http: ^0.13.5
   flutter_inset_box_shadow: ^1.0.8
-  country_picker: ^2.0.16
+  google_fonts: ^3.0.1
+
 
 dev_dependencies:
   flutter_test:
@@ -72,6 +73,7 @@ flutter:
   assets:
     - assets/images/pp_img.jpeg
     - assets/images/home_con_back.jpeg
+    - assets/images/support_pic.png
 
 
   # An image asset can refer to one or more resolution-specific "variants", see

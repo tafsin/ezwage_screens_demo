@@ -6,8 +6,10 @@ import 'package:ezwage_screens_demo/provider/local_provider.dart';
 import 'package:ezwage_screens_demo/provider/textFormProvider.dart';
 import 'package:ezwage_screens_demo/screens/btm_nav.dart';
 import 'package:ezwage_screens_demo/screens/home_page.dart';
+import 'package:ezwage_screens_demo/widgets/errorAlert.dart';
 import 'package:ezwage_screens_demo/widgets/language_toggle.dart';
 import 'package:ezwage_screens_demo/widgets/textFormField.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
@@ -55,6 +57,9 @@ class _Login_PageState extends State<Login_Page> with TickerProviderStateMixin{
   final _signUp2FormKey = GlobalKey<FormState>();
   final _signUp3FormKey = GlobalKey<FormState>();
   final _signUp4FormKey = GlobalKey<FormState>();
+  String? genderValue;
+  String gender = '';
+  List<dynamic> genderList =['Male','Female'];
 Future<void>verifyPhone()async{
   try{
     http.Response response= await http.get(Uri.parse('http://10.0.2.2:8000/api/employee/getEmployee/${numberSignUpController.text}'));
@@ -64,20 +69,19 @@ Future<void>verifyPhone()async{
      var jsdata = jsonDecode(response.body);
      var  data = EmployeeVerificationModel.fromJson(jsdata).data![0];
      print(data.firstName);
-     final TextFormProvider txtFormProvider = Provider.of<TextFormProvider>(context,listen: false);
-     txtFormProvider.setname(data.firstName!);
-     // setState((){
-     //   _currentTabIndex = 1;
-     //   firstNameController.text = data.firstName!;
-     //   lastNameController.text = data.lastName!;
-     //   nidController.text = data.nid!;
-     //   salaryController.text = data.salary!;
-     //   emailAddressController.text = data.email!;
-     //   //genderController.text = data.g
-     //  // employeeTypeController.text = data.employeeId!;
-     //
-     //
-     // });
+     //final TextFormProvider txtFormProvider = Provider.of<TextFormProvider>(context,listen: false);
+    // txtFormProvider.setname(data.firstName!);
+
+       firstNameController.text = data.firstName!;
+       lastNameController.text = data.lastName!;
+       nidController.text = data.nid!;
+       salaryController.text = data.salary!;
+       emailAddressController.text = data.email!;
+       //genderController.text = data.g
+      // employeeTypeController.text = data.employeeId!;
+
+
+
 
    }
 
@@ -93,6 +97,63 @@ Future<void>verifyPhone()async{
   }
 }
 
+Future<void>signUp()async{
+  print(confirmPasswordController.text);
+  const String url = "http://10.0.2.2:8000/api/employee/employeeSignup";
+try{
+  http.Response response = await http.patch(Uri.parse(url),
+    body: jsonEncode({
+      'password': newPasswordController.text,
+      'passwordConfirm': confirmPasswordController.text,
+      'phone': numberSignUpController.text
+    }),
+    headers: {
+    "Content-Type": "application/json"
+    },
+
+  );
+  print(response.statusCode);
+}
+catch(e){
+  print(e);
+}
+
+
+}
+  Future<void>LoginFuntion()async{
+    print(passwordController.text);
+    const String url = "http://10.0.2.2:8000/api/employee/employeeLogin";
+    try{
+      http.Response response = await http.post(Uri.parse(url),
+        body: jsonEncode({
+          'phone': numberController.text,
+
+          'password': passwordController.text,
+
+
+        }),
+        headers: {
+          "Content-Type": "application/json"
+        },
+
+      );
+      if(response.statusCode == 200){
+        Navigator.push(context, MaterialPageRoute(builder: (context)=> Bottom_NavigationBar()));
+      }
+      else{
+        errorAlert(context, "Incorrect phone number or password.");
+      }
+
+      print(response.statusCode);
+    }
+    catch(e){
+      print(e);
+    }
+
+
+  }
+
+
 
 
   @override
@@ -106,9 +167,7 @@ Future<void>verifyPhone()async{
         return Scaffold(
           body: Container(
             width: double.infinity,
-            foregroundDecoration: BoxDecoration(
 
-            ),
             decoration: BoxDecoration(
 
                 gradient: LinearGradient(
@@ -245,11 +304,9 @@ Future<void>verifyPhone()async{
                                           child: TextFormField(
                                             validator: (value) {
                                               if (value == null || value.isEmpty) {
-                                                return 'Please enter your password';
+                                                return 'Please enter your number';
                                               }
-                                              if (value.length < 6) {
-                                                return "Password too short";
-                                              }
+
                                               return null;
                                             },
 
@@ -317,12 +374,10 @@ Future<void>verifyPhone()async{
                                               if (value == null || value.isEmpty) {
                                                 return 'Please enter your password';
                                               }
-                                              if (value.length < 6) {
-                                                return "Password too short";
-                                              }
+
                                               return null;
                                             },
-                                            obscureText: true,
+                                            obscureText: hidePassLogin,
                                             controller: passwordController,
                                             onSaved: (value){
                                               passwordController.text = value!;
@@ -331,7 +386,7 @@ Future<void>verifyPhone()async{
                                               border: InputBorder.none,
 
 
-                                              hintText: AppLocalizations.of(context)!.phoneNumberHint,
+                                              hintText: AppLocalizations.of(context)!.passwordHint,
                                               hintStyle: TextStyle(color: Colors.blueGrey,fontSize: 12),
                                               contentPadding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 6.0),
                                               suffixIcon: hidePassLogin
@@ -394,8 +449,12 @@ Future<void>verifyPhone()async{
                                                 style: ElevatedButton.styleFrom(
                                                     primary: Color(0xffdb1695)
                                                 ),
-                                                onPressed: (){
-                                                  Navigator.push(context, MaterialPageRoute(builder: (context)=> Bottom_NavigationBar()));
+                                                onPressed: () async{
+                                                if(_loginFormKey.currentState!.validate()){
+                                                  await LoginFuntion();
+
+
+                                                }
                                                 }, child: Text(AppLocalizations.of(context)!.login))),
                                         SizedBox(
                                           height: 10,
@@ -471,7 +530,9 @@ Future<void>verifyPhone()async{
                                                     color: Colors.blue,
                                                     borderRadius: BorderRadius.circular(5)
                                                 ),
-                                                child: IconButton(onPressed: (){}, icon:Icon(Icons.fingerprint,color: Colors.white,size: 25,))),
+                                                child: IconButton(onPressed: (){
+
+                                                }, icon:Icon(Icons.fingerprint,color: Colors.white,size: 25,))),
                                             SizedBox(
                                               width: 5,
                                             ),
@@ -548,11 +609,9 @@ Future<void>verifyPhone()async{
                 controller: firstNameController,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter your password';
+                    return 'Please enter your First Name';
                   }
-                  if (value.length < 6) {
-                    return "Password too short";
-                  }
+
                   return null;
                 },
                 decoration: InputDecoration(
@@ -611,11 +670,9 @@ Future<void>verifyPhone()async{
               child: TextFormField(
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter your password';
+                    return 'Please enter your Last Name';
                   }
-                  if (value.length < 6) {
-                    return "Password too short";
-                  }
+
                   return null;
                 },
                 controller: lastNameController,
@@ -675,7 +732,7 @@ Future<void>verifyPhone()async{
                 controller: emailAddressController,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Field cannot be empty';
+                    return 'Please enter your email';
                   }
                   if (!RegExp('^[a-zA-Z0-9_.-]+@[a-zA-Z0-9.-]+.[a-z]')
                       .hasMatch(value)) {
@@ -749,13 +806,13 @@ Future<void>verifyPhone()async{
 
                 },
                 child: TextFormField(
+                  keyboardType: TextInputType.number,
+
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter your password';
+                      return 'Please Enter Your Number';
                     }
-                    if (value.length < 6) {
-                      return "Password too short";
-                    }
+
                     return null;
                   },
                   controller: numberSignUpController,
@@ -772,6 +829,7 @@ Future<void>verifyPhone()async{
 
                       borderRadius: BorderRadius.circular(10.0),
                     ),
+
                   ),
                     onSaved: (value){
               numberSignUpController.text = value!;
@@ -792,11 +850,13 @@ Future<void>verifyPhone()async{
                         primary: Color(0xffdb1695)
                     ),
                     onPressed: (){
-                      print("pressed");
-                      setState(() {
-                        activeIndex++;
-                        _currentTabIndex = 1;
-                      });
+                      if(_signUp1FormKey.currentState!.validate()){
+                        print("pressed");
+                        setState(() {
+                          activeIndex++;
+                          _currentTabIndex = 1;
+                        });
+                      }
                     }, child: Text(AppLocalizations.of(context)!.nextBtn))),
             SizedBox(
               height: 15,
@@ -877,11 +937,9 @@ Future<void>verifyPhone()async{
               child: TextFormField(
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter your password';
+                    return 'Please enter your nid';
                   }
-                  if (value.length < 6) {
-                    return "Password too short";
-                  }
+
                   return null;
                 },
                 controller: nidController,
@@ -940,36 +998,52 @@ Future<void>verifyPhone()async{
               ),
 
 
-              child: TextFormField(
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your password';
-                  }
-                  if (value.length < 6) {
-                    return "Password too short";
-                  }
-                  return null;
-                },
-                controller: genderController,
-                onSaved: (value){
-                  genderController.text = value!;
-                },
-                decoration: InputDecoration(
-                  border: InputBorder.none,
+              child: Padding(
+                padding: const EdgeInsets.only(left: 5.0),
+                child: Container(
+                  // height: 60,
+                  // padding: EdgeInsets.symmetric(
+                  //     horizontal: 6, vertical: 2),
+                  // decoration: BoxDecoration(
+                  //   //errorStyle: TextStyle(fontSize: 0),
+                  //   borderRadius: BorderRadius.circular(6),
+                  //   border: Border.all(
+                  //       color: Colors.purple, width: 1.5),
+                  // ),
+                  child: DropdownButtonFormField<String>(
+                    // decoration: InputDecoration(
 
+                    //
+                    // ),
+                    value: genderValue,
+                    isExpanded: true,
 
-                  hintText: AppLocalizations.of(context)!.gender,
-                  hintStyle: TextStyle(color: Colors.blueGrey,fontSize: 12),
-                  contentPadding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 6.0),
-                  enabledBorder: OutlineInputBorder(
-
-                    borderSide: BorderSide.none,
-
-                    borderRadius: BorderRadius.circular(10.0),
+                    icon: Icon(Icons.arrow_drop_down,
+                        color: Colors.lightGreen),
+                    hint: Text(
+                      AppLocalizations.of(context)!.gender,
+                      style: TextStyle(
+                          color: Colors.black54,
+                         fontWeight: FontWeight.normal,
+                      ),
+                    ),
+                    decoration: InputDecoration(
+                      // filled: true,
+                      errorStyle: TextStyle(fontSize: 0),
+                      border: InputBorder.none,
+                    ),
+                    items: genderList.map(buildCountry).toList(),
+                    onChanged: (value) {
+                      setState(() {
+                        this.genderValue = value;
+                        gender = value!;
+                      });
+                      //leaveType = value;
+                      //checkleaveType();
+                    },
+                    validator: (value) => value == null ? '' : null,
                   ),
                 ),
-
-
               ),
             ),
             SizedBox(
@@ -1396,6 +1470,7 @@ Future<void>verifyPhone()async{
                         primary: Color(0xffdb1695)
                     ),
                     onPressed: (){
+                      signUp();
 
                     }, child: Text(AppLocalizations.of(context)!.signUp))),
 
@@ -1422,6 +1497,14 @@ Future<void>verifyPhone()async{
         return signUp1();
     }
   }
+  DropdownMenuItem<String> buildCountry(dynamic item) => DropdownMenuItem(
+    value: item,
+    child: Text(
+      item,
+      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+    ),
+  );
+
 }
 
 class textForm extends StatelessWidget {

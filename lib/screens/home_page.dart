@@ -1,4 +1,5 @@
 
+import 'package:ezwage_screens_demo/screens/withdraw.dart';
 import 'package:flutter/material.dart';
 
 class Home_Page extends StatefulWidget {
@@ -133,7 +134,9 @@ class _Home_PageState extends State<Home_Page> {
                       )
                     ],
                   ),
-                  MaterialButton(onPressed: (){},
+                  MaterialButton(onPressed: (){
+                    Navigator.push(context, MaterialPageRoute(builder: (context)=> WithDraw()));
+                  },
                     minWidth: 40,
                     height: 35,
                     color: Colors.white,
