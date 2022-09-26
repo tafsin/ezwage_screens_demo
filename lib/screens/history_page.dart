@@ -86,9 +86,9 @@ class _HistoryState extends State<History> with TickerProviderStateMixin{
 
                 ),
                 child: TabBar(
-                  labelColor: Color(0xffdb1695),
+                  // labelColor: Color(0xffdb1695),
                   unselectedLabelColor: Colors.grey,
-                  indicatorColor: Color(0xffdb1695),
+                  indicatorColor: Color(0xff00a2ff),
                   indicatorWeight: 3,
 
                   controller:  tabController,
